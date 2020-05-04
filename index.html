@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Boolflix - Marco Silvestri 2020</title>
+    <link rel="stylesheet" href="assets/styles/main.css">
+</head>
+<body>
+    <!-- Main app WRAPPER -->
+    <div id="app">
+        <!-- Search area with form and input -->
+        <div class="app__search-area">
+            <input type="text" name="movie-search" id="app__search-area__movie-search">
+            <button>Search</button>
+        </div>
+        <!-- Search results WRAPPER -->
+        <div id="app__movie-ground">
+        </div>
+    </div>
+
+    <!-- Template -->
+    <script id="movie-template" type="text/x-handlebars-template">
+        <div class="app__movie-ground__card">
+            <ul class="app__movie-ground__card__detail">
+                <li class="app__movie-ground__card__detail__title">
+                    {{title}}
+                </li>
+                <li class="app__movie-ground__card__detail__title-original">
+                    {{originalTitle}}
+                </li>
+                <li class="app__movie-ground__card__detail__lang-original">
+                    {{originalLanguage}}
+                </li>
+                <li class="app__movie-ground__card__detail__vote-average">
+                    {{voteAverage}}
+                </li>
+            </ul>
+        </div>
+    </script>
+
+    <!-- Load the main.js and dependencies -->
+    <script src="assets/scripts/jquery-3.5.0.min.js"></script>
+    <script src="assets/scripts/handlebars.min-v4.7.6.js"></script>
+    <script src="assets/scripts/main.js"></script>
+</body>
+</html>
