@@ -12,7 +12,7 @@
         <!-- Search area with form and input -->
         <div class="app__search-area">
             <input type="text" name="movie-search" id="app__search-area__movie-search">
-            <button>Search</button>
+            <button>Cerca</button>
         </div>
         <!-- Search results WRAPPER -->
         <div id="app__movie-ground">
@@ -24,16 +24,16 @@
         <div class="app__movie-ground__card">
             <ul class="app__movie-ground__card__detail">
                 <li class="app__movie-ground__card__detail__title">
-                    {{title}}
+                    <span>Titolo: </span>{{title}}
                 </li>
                 <li class="app__movie-ground__card__detail__title-original">
-                    {{originalTitle}}
+                    <span>Titolo originale: </span>{{originalTitle}}
                 </li>
                 <li class="app__movie-ground__card__detail__lang-original">
-                    {{originalLanguage}}
+                    <span>Lingua originale: </span>{{originalLanguage}}
                 </li>
                 <li class="app__movie-ground__card__detail__vote-average">
-                    {{voteAverage}}
+                    <span>Media dei voti: </span>{{voteAverage}}
                 </li>
             </ul>
         </div>
