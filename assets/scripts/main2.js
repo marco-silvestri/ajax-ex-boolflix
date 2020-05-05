@@ -14,7 +14,7 @@ $(document).ready(function () {
     //  Init Handlebars
     var source = $('#movie-template').html();
     var template = Handlebars.compile(source);
-
+/*
     //  Search by hitting ENTER
     inputSearch.keydown(function (e) { 
         switch (e.which){
@@ -32,19 +32,19 @@ $(document).ready(function () {
             default:
                 break
         }
-    });
+    });*/
 
     //  Search by clicking on the button
-    buttonSearch.click(function () { 
-        searchHandler(
-            apiMovie, 
-            apiSeries, 
-            myToken, 
-            template, 
-            inputSearch, 
-            movieGround, 
-            languageSearch
-            );   
+    buttonSearch.click(function () {
+        var searchQuery = inputSearch.val(); 
+        cleanAll(movieGround);
+        //var moviesList = callAndSearch(apiMovie, myToken, languageSearch, searchQuery, 'movie');
+        //var seriesList = callAndSearch(apiSeries, myToken, languageSearch, searchQuery, 'series');
+        console.log(callAndSearch(apiMovie, myToken, languageSearch, searchQuery, 'movie'));
+        //console.log(seriesList);
+        
+        
+        //printMovieCards(moviesList, seriesList, template, movieGround);
     });
     
 }); //  END of DOCUMENT READY
@@ -54,7 +54,7 @@ $(document).ready(function () {
 *****************/
 
 // Search function
-function searchHandler(apiMovie, apiSeries, myToken, template, input, destination, languageSearch){
+/*function searchHandler(apiMovie, apiSeries, myToken, template, input, destination, languageSearch){
         cleanAll(destination);
         var querySearch  = input.val();
         if (querySearch.trim() != ''){
@@ -66,7 +66,6 @@ function searchHandler(apiMovie, apiSeries, myToken, template, input, destinatio
                 template, 
                 destination, 
                 'movie',
-                input
                 );
             callAndSearch(
                 apiSeries, 
@@ -76,17 +75,17 @@ function searchHandler(apiMovie, apiSeries, myToken, template, input, destinatio
                 template, 
                 destination, 
                 'series',
-                input
                 );
         }
         else {
             $('#app__movie-ground').html('Inserisci un valore nella ricerca');
+            input.val('');
             input.focus();
         }
-}
+}*/
 
-//  Ajax call for the search
-function callAndSearch(api, token, language, query, template, destination, condition, input){
+//  Popolute arrays with results of the Ajax
+function callAndSearch(api, token, language, query, condition){
     $.ajax({
         type: "GET",
         url: api,
@@ -96,24 +95,36 @@ function callAndSearch(api, token, language, query, template, destination, condi
             query : query
         },
         success: function (response) {
+            var cardsCollection = [];
             var totalResults = response.results.length;
-            //  If there are no elements matching the search criteria
-            if (response.total_results === 0 && condition == 'movie'){
-                $('#app__movie-ground').append('<p>Nessun Film trovato</p>');
-                input.select();
-                input.val('');
-            }
-            else if (response.total_results === 0 && condition == 'series'){
-                $('#app__movie-ground').append('<p>Nessuna Serie TV trovata</p>');
-                input.select();
-                input.val('');
-            }
-            //  Matching search elements
-            else {
+            if (condition === 'movie'){
                 for (var i = 0; i < totalResults; i++){
-                    printMovieCards(i, response, template, destination, condition);
+                    var thisResult = response.results[i];
+                    var cardItem = {
+                        title : thisResult.title,
+                        originalTitle : thisResult.original_title,
+                        originalLanguage : thisResult.original_language,
+                        voteAverage : thisResult.vote_average,
+                        type : 'Film'  
+                    }
+                    cardsCollection.push(cardItem);
+                    return cardsCollection                    
+                }                
+            }
+            else if (condition === 'series'){
+                for (var i = 0; i < totalResults; i++){
+                    var thisResult = response.results[i];
+                    var cardItem = {
+                        title : thisResult.name,
+                        originalTitle : thisResult.original_name,
+                        originalLanguage : thisResult.original_language,
+                        voteAverage : thisResult.vote_average,
+                        type : 'Serie TV'  
+                    }
+                    cardsCollection.push(cardItem);                    
                 }
             }
+            
         },
         error: function () {  
             console.log('Cannot retrieve the API, try again later');   
@@ -125,7 +136,7 @@ function callAndSearch(api, token, language, query, template, destination, condi
 function cleanAll(destination){
     destination.html('');
 }
-
+/*
 //  Prepare and print the template for the movie cards
 function printMovieCards(i, response, template, destination, condition){
     var thisResult = response.results[i];
@@ -151,7 +162,53 @@ function printMovieCards(i, response, template, destination, condition){
     }
     var output = template(templateData);
     destination.append(output);
+}*/
+
+//  Prepare and print the template for the movie cards
+function printMovieCards(array1, array2, template, destination){
+    if (array1.length == 0 && array2.length == 0){
+        $('#app__movie-ground').html('Nessun risultato trovato');
+    }
+    else {
+        var fullList = array1.concat(array2);
+        for (var i = 0; i < fullList.length; i++){
+            var thisResult = fullList[i];
+            var starsAverage = countStars(thisResult.vote_average);
+            var languageFlag = switchToFlag(thisResult.original_language);
+            var templateData = {
+                title : thisResult.title,
+                originalTitle : thisResult.original_title,
+                originalLanguage : languageFlag,
+                voteAverage : starsAverage,
+                type : thisResult.type
+            };
+        }
+    }
+    var output = template(templateData);
+    destination.append(output);
 }
+    /*
+        //var starsAverage = countStars(thisResult.vote_average);
+        //var languageFlag = switchToFlag(thisResult.original_language);
+        if (condition == 'movie'){
+            var templateData = {
+                title : thisResult.title,
+                originalTitle : thisResult.original_title,
+                originalLanguage : languageFlag,
+                voteAverage : starsAverage,
+                type : 'Film'
+            };
+        }
+        else if (condition == 'series'){
+            var templateData = {
+                title : thisResult.name,
+                originalTitle : thisResult.original_name,
+                originalLanguage : languageFlag,
+                voteAverage : starsAverage,
+                type : 'Serie TV'
+            };
+        }*/    
+
 
 //  Show stars instead of numbers
 function countStars(voteAverage){
