@@ -5,6 +5,7 @@ $(document).ready(function () {
     var apiSeries = 'https://api.themoviedb.org/3/search/tv';
     var myToken = 'e80fd63011e84d9eb3ea864a957b8a81';
     var languageSearch = 'it-IT'; //Default language
+    var resultsFeedback = 0;
 
     //  jQuery refs
     var inputSearch = $('#app__search-area__movie-search');
@@ -19,7 +20,17 @@ $(document).ready(function () {
     inputSearch.keydown(function (e) { 
         switch (e.which){
             case 13: // 13 is ENTER
-                searchAndPrint(apiMovie, apiSeries, myToken, template, inputSearch, movieGround, languageSearch);
+                searchHandler(
+                    apiMovie, 
+                    apiSeries, 
+                    myToken, 
+                    template, 
+                    inputSearch, 
+                    movieGround, 
+                    languageSearch,
+                    resultsFeedback
+                    );
+                    checkerResults(resultsFeedback, inputSearch);
                 break;
             default:
                 break
@@ -28,23 +39,27 @@ $(document).ready(function () {
 
     //  Search by clicking on the button
     buttonSearch.click(function () { 
-        searchAndPrint(
+        searchHandler(
             apiMovie, 
             apiSeries, 
             myToken, 
             template, 
             inputSearch, 
             movieGround, 
-            languageSearch
+            languageSearch,
+            resultsFeedback
             );
+            checkerResults(resultsFeedback, inputSearch);
     });
+    
 }); //  END of DOCUMENT READY
 
 /****************
 *   FUNCTIONS   *
 *****************/
 
-function searchAndPrint(apiMovie, apiSeries, myToken, template, input, destination, languageSearch){
+// Search function
+function searchHandler(apiMovie, apiSeries, myToken, template, input, destination, languageSearch, resultsFeedback){
         cleanAll(destination);
         var querySearch  = input.val();
         if (querySearch.trim() != ''){
@@ -53,20 +68,20 @@ function searchAndPrint(apiMovie, apiSeries, myToken, template, input, destinati
                 myToken, 
                 languageSearch, 
                 querySearch, 
-                input, 
                 template, 
                 destination, 
-                'movie'
+                'movie',
+                resultsFeedback
                 );
             callAndSearch(
                 apiSeries, 
                 myToken, 
                 languageSearch, 
                 querySearch, 
-                input, 
                 template, 
                 destination, 
-                'series'
+                'series',
+                resultsFeedback
                 );
         }
         else {
@@ -76,7 +91,8 @@ function searchAndPrint(apiMovie, apiSeries, myToken, template, input, destinati
         }
 }
 
-function callAndSearch(api, token, language, query, input, template, destination, condition){
+//  Ajax call for the search
+function callAndSearch(api, token, language, query, template, destination, condition, resultsFeedback){
     $.ajax({
         type: "GET",
         url: api,
@@ -89,8 +105,7 @@ function callAndSearch(api, token, language, query, input, template, destination
             var totalResults = response.results.length;
             //  If there are no elements matching the search criteria
             if (response.total_results === 0){
-                $('#app__movie-ground').html('Nessun film trovato');
-                input.select();
+                return resultsFeedback +=1;
             }
             //  Matching search elements
             else {
@@ -105,11 +120,20 @@ function callAndSearch(api, token, language, query, input, template, destination
     });
 }
 
+//  No matching results handler
+function checkerResults(resultsFeedback, input){
+    if (resultsFeedback == 0){
+        $('#app__movie-ground').html('Nessun risultato trovato');
+        input.select();
+    }
+}
+
 //  Clean a destination
 function cleanAll(destination){
     destination.html('');
 }
 
+//  Prepare and print the template for the movie cards
 function printMovieCards(i, response, template, destination, condition){
     var thisResult = response.results[i];
     var starsAverage = countStars(thisResult.vote_average);
@@ -136,7 +160,7 @@ function printMovieCards(i, response, template, destination, condition){
     destination.append(output);
 }
 
-
+//  Show stars instead of numbers
 function countStars(voteAverage){
     var normalizedAverage = Math.ceil(voteAverage/2);
     var evaluation = '';
@@ -149,6 +173,7 @@ function countStars(voteAverage){
     return evaluation;
 }
 
+//  Read the language and show a flag instead of chars
 function switchToFlag(language){
     switch (language) {
         case 'it':
@@ -159,12 +184,3 @@ function switchToFlag(language){
             return language;
     }
 }
-
-/*  TODO
-*   -Serialize params objects
-*
-*
-*
-*
-*
-*/
