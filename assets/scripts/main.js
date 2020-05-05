@@ -113,11 +113,12 @@ function cleanAll(destination){
 function printMovieCards(i, response, template, destination, condition){
     var thisResult = response.results[i];
     var starsAverage = countStars(thisResult.vote_average);
+    var languageFlag = switchToFlag(thisResult.original_language);
     if (condition == 'movie'){
         var templateData = {
             title : thisResult.title,
             originalTitle : thisResult.original_title,
-            originalLanguage : thisResult.original_language,
+            originalLanguage : languageFlag,
             voteAverage : starsAverage,
             type : 'Film'
         };
@@ -126,7 +127,7 @@ function printMovieCards(i, response, template, destination, condition){
         var templateData = {
             title : thisResult.name,
             originalTitle : thisResult.original_name,
-            originalLanguage : thisResult.original_language,
+            originalLanguage : languageFlag,
             voteAverage : starsAverage,
             type : 'Serie TV'
         };
@@ -139,13 +140,24 @@ function printMovieCards(i, response, template, destination, condition){
 function countStars(voteAverage){
     var normalizedAverage = Math.ceil(voteAverage/2);
     var evaluation = '';
-    for (var fullStars = 0; fullStars < normalizedAverage; fullStars++){
-        evaluation += '<i class="fas fa-star"></i>';
+    for (var fullStars = 1; fullStars <= normalizedAverage; fullStars++){
+        evaluation += '<i class="fas fa-star" data-vote="'+ fullStars +'"></i>';
     }
-    for (fullStars; fullStars < 5; fullStars++){
-        evaluation += '<i class="far fa-star"></i>';
+    for (fullStars; fullStars <= 5; fullStars++){
+        evaluation += '<i class="far fa-star" data-vote="'+ fullStars +'"></i>';
     }
     return evaluation;
+}
+
+function switchToFlag(language){
+    switch (language) {
+        case 'it':
+            return '<img class="flag" src="assets/img/it.svg" alt="lang_it">'
+        case 'en':
+            return '<img class="flag" src="assets/img/en.svg" alt="lang_en">'
+        default:
+            return language;
+    }
 }
 
 /*  TODO
