@@ -5,7 +5,6 @@ $(document).ready(function () {
     var apiSeries = 'https://api.themoviedb.org/3/search/tv';
     var myToken = 'e80fd63011e84d9eb3ea864a957b8a81';
     var languageSearch = 'it-IT'; //Default language
-    var resultsFeedback = 0;
 
     //  jQuery refs
     var inputSearch = $('#app__search-area__movie-search');
@@ -27,10 +26,8 @@ $(document).ready(function () {
                     template, 
                     inputSearch, 
                     movieGround, 
-                    languageSearch,
-                    resultsFeedback
+                    languageSearch
                     );
-                    checkerResults(resultsFeedback, inputSearch);
                 break;
             default:
                 break
@@ -46,10 +43,8 @@ $(document).ready(function () {
             template, 
             inputSearch, 
             movieGround, 
-            languageSearch,
-            resultsFeedback
-            );
-            checkerResults(resultsFeedback, inputSearch);
+            languageSearch
+            );   
     });
     
 }); //  END of DOCUMENT READY
@@ -59,7 +54,7 @@ $(document).ready(function () {
 *****************/
 
 // Search function
-function searchHandler(apiMovie, apiSeries, myToken, template, input, destination, languageSearch, resultsFeedback){
+function searchHandler(apiMovie, apiSeries, myToken, template, input, destination, languageSearch){
         cleanAll(destination);
         var querySearch  = input.val();
         if (querySearch.trim() != ''){
@@ -71,7 +66,6 @@ function searchHandler(apiMovie, apiSeries, myToken, template, input, destinatio
                 template, 
                 destination, 
                 'movie',
-                resultsFeedback
                 );
             callAndSearch(
                 apiSeries, 
@@ -81,7 +75,6 @@ function searchHandler(apiMovie, apiSeries, myToken, template, input, destinatio
                 template, 
                 destination, 
                 'series',
-                resultsFeedback
                 );
         }
         else {
@@ -92,7 +85,7 @@ function searchHandler(apiMovie, apiSeries, myToken, template, input, destinatio
 }
 
 //  Ajax call for the search
-function callAndSearch(api, token, language, query, template, destination, condition, resultsFeedback){
+function callAndSearch(api, token, language, query, template, destination, condition){
     $.ajax({
         type: "GET",
         url: api,
@@ -104,8 +97,13 @@ function callAndSearch(api, token, language, query, template, destination, condi
         success: function (response) {
             var totalResults = response.results.length;
             //  If there are no elements matching the search criteria
-            if (response.total_results === 0){
-                return resultsFeedback +=1;
+            if (response.total_results === 0 && condition == 'movie'){
+                $('#app__movie-ground').append('<p>Nessun Film trovato</p>');
+                input.select();
+            }
+            else if (response.total_results === 0 && condition == 'series'){
+                $('#app__movie-ground').append('<p>Nessuna Serie TV trovata</p>');
+                input.select();
             }
             //  Matching search elements
             else {
@@ -118,14 +116,6 @@ function callAndSearch(api, token, language, query, template, destination, condi
             console.log('Cannot retrieve the API, try again later');   
         }
     });
-}
-
-//  No matching results handler
-function checkerResults(resultsFeedback, input){
-    if (resultsFeedback == 0){
-        $('#app__movie-ground').html('Nessun risultato trovato');
-        input.select();
-    }
 }
 
 //  Clean a destination
