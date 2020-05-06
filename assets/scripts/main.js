@@ -1,10 +1,16 @@
 $(document).ready(function () {
     
-    //  Global variables
-    var apiMovie = 'https://api.themoviedb.org/3/search/movie';
-    var apiSeries = 'https://api.themoviedb.org/3/search/tv';
-    var myToken = 'e80fd63011e84d9eb3ea864a957b8a81';
-    var languageSearch = 'it-IT'; //Default language
+    //  Global
+    var apiData = {
+        endPoint : 'https://api.themoviedb.org/3/search/',
+        token :'e80fd63011e84d9eb3ea864a957b8a81',
+        languageSearch : 'it-IT'
+    };
+
+    var searchTypes = [
+        'tv',
+        'movie'
+    ];
 
     //  jQuery refs
     var inputSearch = $('#app__search-area__movie-search');
@@ -19,15 +25,7 @@ $(document).ready(function () {
     inputSearch.keydown(function (e) { 
         switch (e.which){
             case 13: // 13 is ENTER
-                searchHandler(
-                    apiMovie, 
-                    apiSeries, 
-                    myToken, 
-                    template, 
-                    inputSearch, 
-                    movieGround, 
-                    languageSearch
-                    );
+                searchHandler(apiData, searchTypes, inputSearch, template, movieGround);
                 break;
             default:
                 break
@@ -36,15 +34,7 @@ $(document).ready(function () {
 
     //  Search by clicking on the button
     buttonSearch.click(function () { 
-        searchHandler(
-            apiMovie, 
-            apiSeries, 
-            myToken, 
-            template, 
-            inputSearch, 
-            movieGround, 
-            languageSearch
-            );   
+        searchHandler(apiData, searchTypes, inputSearch, template, movieGround);   
     });
     
 }); //  END of DOCUMENT READY
@@ -54,30 +44,13 @@ $(document).ready(function () {
 *****************/
 
 // Search function
-function searchHandler(apiMovie, apiSeries, myToken, template, input, destination, languageSearch){
+function searchHandler(api, types, input, template, destination){
         cleanAll(destination);
         var querySearch  = input.val();
         if (querySearch.trim() != ''){
-            callAndSearch(
-                apiMovie, 
-                myToken, 
-                languageSearch, 
-                querySearch, 
-                template, 
-                destination, 
-                'movie',
-                input
-                );
-            callAndSearch(
-                apiSeries, 
-                myToken, 
-                languageSearch, 
-                querySearch, 
-                template, 
-                destination, 
-                'series',
-                input
-                );
+            for (i = 0; i < types.length; i++){
+                callAndSearch(api, types[i], querySearch, input, template, destination);
+            }
         }
         else {
             $('#app__movie-ground').html('Inserisci un valore nella ricerca');
@@ -86,24 +59,24 @@ function searchHandler(apiMovie, apiSeries, myToken, template, input, destinatio
 }
 
 //  Ajax call for the search
-function callAndSearch(api, token, language, query, template, destination, condition, input){
+function callAndSearch(api, type, query, input, template, destination){
     $.ajax({
         type: "GET",
-        url: api,
+        url: api.endPoint + type,
         data: {
-            api_key : token,
-            language : language,
+            api_key : api.token,
+            language : api.languageSearch,
             query : query
         },
         success: function (response) {
             var totalResults = response.results.length;
             //  If there are no elements matching the search criteria
-            if (response.total_results === 0 && condition == 'movie'){
+            if (response.total_results === 0 && type == 'movie'){
                 $('#app__movie-ground').append('<p>Nessun Film trovato</p>');
                 input.select();
                 input.val('');
             }
-            else if (response.total_results === 0 && condition == 'series'){
+            else if (response.total_results === 0 && type == 'tv'){
                 $('#app__movie-ground').append('<p>Nessuna Serie TV trovata</p>');
                 input.select();
                 input.val('');
@@ -111,7 +84,7 @@ function callAndSearch(api, token, language, query, template, destination, condi
             //  Matching search elements
             else {
                 for (var i = 0; i < totalResults; i++){
-                    printMovieCards(i, response, template, destination, condition);
+                    printMovieCards(i, response, template, destination, type);
                 }
             }
         },
@@ -127,27 +100,23 @@ function cleanAll(destination){
 }
 
 //  Prepare and print the template for the movie cards
-function printMovieCards(i, response, template, destination, condition){
+function printMovieCards(i, response, template, destination, type){
     var thisResult = response.results[i];
     var starsAverage = countStars(thisResult.vote_average);
     var languageFlag = switchToFlag(thisResult.original_language);
-    if (condition == 'movie'){
-        var templateData = {
-            title : thisResult.title,
-            originalTitle : thisResult.original_title,
-            originalLanguage : languageFlag,
-            voteAverage : starsAverage,
-            type : 'Film'
-        };
+    var templateData = {
+        originalLanguage : languageFlag,
+        voteAverage : starsAverage
+    };
+    if (type == 'movie'){
+        templateData.title = thisResult.title;
+        templateData.originalTitle = thisResult.original_title;
+        templateData.type = 'Film'
     }
-    else if (condition == 'series'){
-        var templateData = {
-            title : thisResult.name,
-            originalTitle : thisResult.original_name,
-            originalLanguage : languageFlag,
-            voteAverage : starsAverage,
-            type : 'Serie TV'
-        };
+    else if (type == 'tv'){
+        templateData.title = thisResult.name;
+        templateData.originalTitle = thisResult.original_name;
+        templateData.type = 'Serie TV'
     }
     var output = template(templateData);
     destination.append(output);
@@ -157,23 +126,26 @@ function printMovieCards(i, response, template, destination, condition){
 function countStars(voteAverage){
     var normalizedAverage = Math.ceil(voteAverage/2);
     var evaluation = '';
-    for (var fullStars = 1; fullStars <= normalizedAverage; fullStars++){
-        evaluation += '<i class="fas fa-star" data-vote="'+ fullStars +'"></i>';
+    for (var i = 1; i <= 5; i++){
+        if (i <= normalizedAverage){
+            evaluation += '<i class="fas fa-star" data-vote="'+ i +'"></i>';
+        }
+        else {
+            evaluation += '<i class="far fa-star" data-vote="'+ i +'"></i>';
+        }   
     }
-    for (fullStars; fullStars <= 5; fullStars++){
-        evaluation += '<i class="far fa-star" data-vote="'+ fullStars +'"></i>';
-    }
-    return evaluation;
+    return evaluation
 }
 
 //  Read the language and show a flag instead of chars
 function switchToFlag(language){
-    switch (language) {
-        case 'it':
-            return '<img class="flag" src="assets/img/it.svg" alt="lang_it">'
-        case 'en':
-            return '<img class="flag" src="assets/img/en.svg" alt="lang_en">'
-        default:
-            return language;
+    var languageList = [
+        'en',
+        'it'
+    ];
+    if (languageList.includes(language)){
+        var flag = '<img class="flag" src="assets/img/'+ language + '.svg" alt="lang_' + language + '">'
+        return flag;
     }
+    return language;
 }
