@@ -1,23 +1,48 @@
+/* General */
+
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
+
 header {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 20px 50px;
     min-height: 100px;
     background-color: black;
 }
 
 h1 {
-    color: red;
+    color: #E50914;
+    font-size: 48px;
+}
+
+body {
+    font-family: 'Nunito Sans', sans-serif;
+    background-color: #cccccc;
+}
+
+/* Wrappers */
+
+.app__search-area button,
+.app__search-area input {
+    background-color: transparent;
+    border: none;
+    border-bottom: 2px #CCC solid;
+    font-size: 24px;
+    color: #E50914;
+}
+
+.app__search-area button{
+    border-bottom: transparent;
+
 }
 
 #app__movie-ground {
     padding: 50px;
-    background-color: #cccccc;
     display: flex;
     justify-content: space-around;
     flex-wrap: wrap;
@@ -31,7 +56,11 @@ h1 {
 
 .app__movie-ground__card__poster {
     display: block;
+    max-height: 482px;
+    min-width: 342px;
 }
+
+/* Overlay */
 
 .app__movie-ground__card__detail{
     list-style: none;
@@ -50,12 +79,20 @@ h1 {
     opacity: 1;
 }
 
+/* End Overlay */
+
+/* Detail text */
+
 .app__movie-ground__card__detail__item i{
     color: yellow;
 }
 
 .app__movie-ground__card__detail__item span:nth-of-type(1) {
     font-weight: 700;
+}
+
+.app__movie-ground__card__detail__item span:nth-of-type(2) {
+    font-weight: 200;
 }
 
 .flag {
@@ -68,3 +105,4 @@ img[src='assets/img/no-product-image.png']{
     width: 342px;
     height: 482px;
 }
+
