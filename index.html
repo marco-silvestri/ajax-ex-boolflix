@@ -12,10 +12,15 @@
     <!-- Main app WRAPPER -->
     <div id="app">
         <!-- Search area with form and input -->
-        <div class="app__search-area">
-            <input type="text" name="movie-search" id="app__search-area__movie-search">
-            <button>Cerca</button>
-        </div>
+        <header>
+            <div class="app__logo-area">
+                <h1>Boolflix</h1>
+            </div>
+            <div class="app__search-area">
+                <input type="text" name="movie-search" id="app__search-area__movie-search">
+                <button>Cerca</button>
+            </div>
+        </header>
         <!-- Search results WRAPPER -->
         <div id="app__movie-ground">
         </div>
@@ -26,23 +31,29 @@
         <div class="app__movie-ground__card">
             <img class="app__movie-ground__card__poster" src="{{posterSource}}">
             <ul class="app__movie-ground__card__detail">
-                <li class="app__movie-ground__card__detail__title">
-                    <span>Titolo: </span>{{title}}
+                <li class="app__movie-ground__card__detail__item">
+                    <span>Titolo: </span>
+                    <span>{{title}}</span>
                 </li>
-                <li class="app__movie-ground__card__detail__title-original">
-                    <span>Titolo originale: </span>{{originalTitle}}
+                <li class="app__movie-ground__card__detail__item">
+                    <span>Titolo originale: </span>
+                    <span>{{originalTitle}}</span>
                 </li>
-                <li class="app__movie-ground__card__detail__lang-original">
-                    <span>Lingua originale: </span>{{{originalLanguage}}}
+                <li class="app__movie-ground__card__detail__item">
+                    <span>Lingua originale: </span>
+                    <span>{{{originalLanguage}}}</span>
                 </li>
-                <li class="app__movie-ground__card__detail__overview">
-                    <span>Sinossi: </span> {{synopsis}}
+                <li class="app__movie-ground__card__detail__item">
+                    <span>Sinossi: </span>
+                    <span>{{synopsis}}</span>
                 </li>
-                <li class="app__movie-ground__card__detail__vote-average">
-                    <span>Media dei voti: </span>{{{voteAverage}}}
+                <li class="app__movie-ground__card__detail__item">
+                    <span>Media dei voti: </span>
+                    <span>{{{voteAverage}}}</span>
                 </li>
-                <li class="app_movie-ground__card__detail__type">
-                    <span>Tipo: </span>{{type}}
+                <li class="app_movie-ground__card__detail__item">
+                    <span>Tipo: </span>
+                    <span>{{type}}</span>
                 </li>
             </ul>
         </div>
