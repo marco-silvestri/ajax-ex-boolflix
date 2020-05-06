@@ -108,7 +108,7 @@ function printMovieCards(i, response, template, destination, type){
         originalLanguage : languageFlag,
         voteAverage : starsAverage,
         posterSource : createPoster(thisResult),
-        synopsis : thisResult.overview.substr(0, 50) + '...'
+        synopsis : createSynopsis(thisResult, 150)
     };
     if (type == 'movie'){
         templateData.title = thisResult.title;
@@ -140,6 +140,16 @@ function createPoster(thisResult){
         var posterPath = posterSource.baseConstructor + posterSource.medium + thisResult.poster_path
     }
     return posterPath;
+}
+
+//  Create synopsis
+function createSynopsis(thisResult, beforeTruncation) {
+    if (thisResult.overview != ''){
+        return thisResult.overview.substr(0, beforeTruncation) + '...'
+    } 
+    else if (thisResult.overview == ''){
+        return 'Siamo spiacenti, non è presente nessuna sinossi nella lingua selezionata.'
+    } 
 }
 
 //  Show stars instead of numbers
