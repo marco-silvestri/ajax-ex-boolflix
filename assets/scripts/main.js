@@ -106,7 +106,9 @@ function printMovieCards(i, response, template, destination, type){
     var languageFlag = switchToFlag(thisResult.original_language);
     var templateData = {
         originalLanguage : languageFlag,
-        voteAverage : starsAverage
+        voteAverage : starsAverage,
+        posterSource : createPoster(thisResult),
+        synopsis : thisResult.overview.substr(0, 50) + '...'
     };
     if (type == 'movie'){
         templateData.title = thisResult.title;
@@ -120,6 +122,24 @@ function printMovieCards(i, response, template, destination, type){
     }
     var output = template(templateData);
     destination.append(output);
+}
+
+//  Dynamically create a poster, if not found load a placeholder
+function createPoster(thisResult){
+    var posterSource = {
+        baseConstructor : 'https://image.tmdb.org/t/p/',
+        small : 'w154',
+        medium : 'w342',
+        large : 'w780',
+        original : 'original'
+    };
+    if (thisResult.poster_path == null){
+        var posterPath = 'assets/img/no-product-image.png';
+    }
+    else {
+        var posterPath = posterSource.baseConstructor + posterSource.medium + thisResult.poster_path
+    }
+    return posterPath;
 }
 
 //  Show stars instead of numbers

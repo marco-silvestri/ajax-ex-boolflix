@@ -3,3 +3,7 @@
     height: 20px;
     vertical-align: middle;
 }
+
+img[src='assets/img/no-product-image.png']{
+    width: 342px;
+}

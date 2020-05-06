@@ -24,6 +24,7 @@
     <!-- Template -->
     <script id="movie-template" type="text/x-handlebars-template">
         <div class="app__movie-ground__card">
+            <img class="app__movie-ground__card__poster" src="{{posterSource}}">
             <ul class="app__movie-ground__card__detail">
                 <li class="app__movie-ground__card__detail__title">
                     <span>Titolo: </span>{{title}}
@@ -33,6 +34,9 @@
                 </li>
                 <li class="app__movie-ground__card__detail__lang-original">
                     <span>Lingua originale: </span>{{{originalLanguage}}}
+                </li>
+                <li class="app__movie-ground__card__detail__overview">
+                    <span>Sinossi: </span> {{synopsis}}
                 </li>
                 <li class="app__movie-ground__card__detail__vote-average">
                     <span>Media dei voti: </span>{{{voteAverage}}}
