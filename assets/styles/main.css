@@ -74,8 +74,9 @@ body {
     height: 100%;
     width: 100%;
     padding: 20px;
-    background-color: rgba(0, 0, 0, .5);
+    background-color: rgba(0, 0, 0, .8);
     color: white;
+    border: 1px solid white;
     opacity: 0;
     transition: .2s ease;
 }
@@ -83,8 +84,6 @@ body {
 .app__movie-ground__card__detail:hover{
     opacity: 1;
 }
-
-/* End Overlay */
 
 /* Detail text */
 

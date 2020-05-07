@@ -22,13 +22,9 @@ $(document).ready(function () {
     var template = Handlebars.compile(source);
 
     //  Search by hitting ENTER
-    inputSearch.keydown(function (e) { 
-        switch (e.which){
-            case 13: // 13 is ENTER
-                searchHandler(apiData, searchTypes, inputSearch, template, movieGround);
-                break;
-            default:
-                break
+    inputSearch.keypress(function (e) {
+        if (e.which == 13){
+            searchHandler(apiData, searchTypes, inputSearch, template, movieGround);
         }
     });
 
@@ -149,7 +145,7 @@ function createSynopsis(thisResult, beforeTruncation) {
     } 
     else if (thisResult.overview == ''){
         return 'Siamo spiacenti, non è presente nessuna sinossi nella lingua selezionata.'
-    } 
+    }
 }
 
 //  Show stars instead of numbers
