@@ -60,9 +60,13 @@ body {
 
 .app__movie-ground__card__poster {
     display: block;
-    max-height: 482px;
-    min-width: 342px;
     border: 1px solid white;
+}
+
+.app__movie-ground__card__detail,
+.app__movie-ground__card__poster {
+    height: 482px;
+    width: 342px;
 }
 
 /* Overlay */
@@ -71,8 +75,6 @@ body {
     list-style: none;
     position: absolute;
     top: 0;
-    height: 100%;
-    width: 100%;
     padding: 20px;
     background-color: rgba(0, 0, 0, .8);
     color: white;

@@ -1,16 +1,11 @@
 $(document).ready(function () {
     
-    //  Global variables
+    //  Global
     var apiData = {
         endPoint : 'https://api.themoviedb.org/3/search/',
         token :'e80fd63011e84d9eb3ea864a957b8a81',
         languageSearch : 'it-IT'
     };
-
-    var searchTypes = [
-        'tv',
-        'movie'
-    ];
 
     //  jQuery refs
     var inputSearch = $('#app__search-area__movie-search');
@@ -22,19 +17,15 @@ $(document).ready(function () {
     var template = Handlebars.compile(source);
 
     //  Search by hitting ENTER
-    inputSearch.keydown(function (e) { 
-        switch (e.which){
-            case 13: // 13 is ENTER
-                searchHandler(apiData, searchTypes, inputSearch, template, movieGround);
-                break;
-            default:
-                break
+    inputSearch.keypress(function (e) {
+        if (e.which == 13){
+            searchHandler(apiData, inputSearch, movieGround, template);
         }
     });
 
     //  Search by clicking on the button
     buttonSearch.click(function () { 
-        searchHandler(apiData, searchTypes, inputSearch, template, movieGround);   
+        searchHandler(apiData, inputSearch, movieGround, template);
     });
     
 }); //  END of DOCUMENT READY
@@ -44,54 +35,48 @@ $(document).ready(function () {
 *****************/
 
 // Search function
-function searchHandler(api, types, input, template, destination){
-        cleanAll(destination);
-        var querySearch  = input.val();
-        if (querySearch.trim() != ''){
-            for (i = 0; i < types.length; i++){
-                callAndSearch(api, types[i], querySearch, input, template, destination);
-            }
+function searchHandler(api, input, destination, template){
+    cleanAll(destination);
+    let querySearch  = input.val();
+    Promise.all([
+        callAndSearch(api, 'movie', querySearch),
+        callAndSearch(api, 'tv', querySearch)
+    ])
+    .then((result) =>{
+        if (result[0].total_results === 0 && result[1].total_results === 0){
+            destination.html('Nessun risultato di ricerca')
         }
         else {
-            $('#app__movie-ground').html('Inserisci un valore nella ricerca');
-            input.focus();
-        }
+            for (var i = 0; i < result[0].results.length; i++){
+                printMovieCards(result[0].results, template, destination, 'movie', i)
+            };
+            for (var i = 0; i < result[1].results.length; i++){
+                printMovieCards(result[1].results, template, destination, 'tv', i)
+            };
+        };
+    })
 }
 
 //  Ajax call for the search
-function callAndSearch(api, type, query, input, template, destination){
-    $.ajax({
-        type: "GET",
-        url: api.endPoint + type,
-        data: {
-            api_key : api.token,
-            language : api.languageSearch,
-            query : query
-        },
-        success: function (response) {
-            var totalResults = response.results.length;
-            //  If there are no elements matching the search criteria
-            if (response.total_results === 0 && type == 'movie'){
-                $('#app__movie-ground').append('<p>Nessun Film trovato</p>');
-                input.select();
-                input.val('');
+function callAndSearch(api, type, query){
+    var result =
+        $.ajax({
+            type: "GET",
+            url: api.endPoint + type,
+            data: {
+                api_key : api.token,
+                language : api.languageSearch,
+                query : query
+            },
+            success: () => {
+                console.log('yay');
+            },
+            error: function () {
+                let err = 'Cannot retrieve the API, try again later';  
+                PromiseRejectionEvent(console.log(err));  
             }
-            else if (response.total_results === 0 && type == 'tv'){
-                $('#app__movie-ground').append('<p>Nessuna Serie TV trovata</p>');
-                input.select();
-                input.val('');
-            }
-            //  Matching search elements
-            else {
-                for (var i = 0; i < totalResults; i++){
-                    printMovieCards(i, response, template, destination, type);
-                }
-            }
-        },
-        error: function () {  
-            console.log('Cannot retrieve the API, try again later');   
-        }
-    });
+        });;
+        return result.promise();
 }
 
 //  Clean a destination
@@ -100,13 +85,15 @@ function cleanAll(destination){
 }
 
 //  Prepare and print the template for the movie cards
-function printMovieCards(i, response, template, destination, type){
-    var thisResult = response.results[i];
+function printMovieCards(response, template, destination, type, i){
+    var thisResult = response[i];
     var starsAverage = countStars(thisResult.vote_average);
     var languageFlag = switchToFlag(thisResult.original_language);
     var templateData = {
         originalLanguage : languageFlag,
-        voteAverage : starsAverage
+        voteAverage : starsAverage,
+        posterSource : createPoster(thisResult),
+        synopsis : createSynopsis(thisResult, 150)
     };
     if (type == 'movie'){
         templateData.title = thisResult.title;
@@ -119,7 +106,35 @@ function printMovieCards(i, response, template, destination, type){
         templateData.type = 'Serie TV'
     }
     var output = template(templateData);
-    destination.append(output);
+    destination.append(output);  
+}
+
+//  Dynamically create a poster, if not found load a placeholder
+function createPoster(thisResult){
+    var posterSource = {
+        baseConstructor : 'https://image.tmdb.org/t/p/',
+        small : 'w154',
+        medium : 'w342',
+        large : 'w780',
+        original : 'original'
+    };
+    if (thisResult.poster_path == null){
+        var posterPath = 'assets/img/no-product-image.png';
+    }
+    else {
+        var posterPath = posterSource.baseConstructor + posterSource.medium + thisResult.poster_path;
+    }
+    return posterPath;
+}
+
+//  Create synopsis
+function createSynopsis(thisResult, beforeTruncation) {
+    if (thisResult.overview != ''){
+        return thisResult.overview.substr(0, beforeTruncation) + '...'
+    } 
+    else if (thisResult.overview == ''){
+        return 'Siamo spiacenti, non è presente nessuna sinossi nella lingua selezionata.'
+    }
 }
 
 //  Show stars instead of numbers
